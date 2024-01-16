@@ -1,23 +1,17 @@
-import boto3
-from flask import Flask, Response
-from botocore.exceptions import NoCredentialsError
+from flask import Flask
+import threading
+
+from facialRecognition import main
 
 app = Flask(__name__)
 
-@app.route('/login', methods=['GET'])
-def get_image():
-    s3 = boto3.client('s3')
 
-    try:
-        file = s3.get_object(Bucket='bucket-name', Key='image-key')
-    except NoCredentialsError:
-        return "No AWS credentials found", 403
+@app.route('/login/faceid', methods=['GET', 'POST'])
+def GetFaceImageFromS3Bucket():
+    # Start the face recognition in a new thread
+    threading.Thread(target=main).start()
+    return 'Face recognition for login started!'
 
-    return Response(
-        file['Body'].read(),
-        mimetype='image/jpeg',
-        headers={"Content-Disposition": "attachment;filename=image.jpg"}
-    )
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='localhost', port=3000, debug=True)

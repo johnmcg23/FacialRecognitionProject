@@ -6,7 +6,7 @@ import os
 def load_known_faces():
     known_faces = []
     known_face_names = []
-    for filename in os.listdir('.'):
+    for filename in os.listdir('.'):  # Looks in this file for images
         if filename.endswith((".png", ".jpg", ".jpeg")):  # Add more file types if needed
             image = face_recognition.load_image_file(filename)
             face_encoding = face_recognition.face_encodings(image)[0]
@@ -29,12 +29,14 @@ def process_frame(frame, known_faces, known_face_names):
         # See if the face is a match for the known face(s)
         matches = face_recognition.compare_faces(known_faces, face_encoding)
         name = "NO MATCH"
+        print('no match')
         color = (0, 0, 255)  # Red
 
         # If a match was found in known_faces, use the first one.
         if True in matches:
             first_match_index = matches.index(True)
             name = known_face_names[first_match_index]
+            print('no match')
             color = (0, 255, 0)  # Green
 
         face_names.append((name, color))
@@ -60,7 +62,7 @@ def display_results(frame, face_locations, face_names):
         cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
     # Display the resulting image
-    cv2.imshow('Video', frame)
+    # cv2.imshow('Video', frame)  # Commented out to prevent window from opening
 
 
 def main():
