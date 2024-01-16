@@ -2,6 +2,7 @@ import cv2
 import face_recognition
 import os
 
+
 def load_known_faces():
     known_faces = []
     known_face_names = []
@@ -13,6 +14,7 @@ def load_known_faces():
             name, ext = os.path.splitext(filename)  # Split the filename and the extension
             known_face_names.append(name)
     return known_faces, known_face_names
+
 
 def process_frame(frame, known_faces, known_face_names):
     # Resize frame of video to 1/4 size for faster face recognition processing
@@ -39,6 +41,7 @@ def process_frame(frame, known_faces, known_face_names):
 
     return face_locations, face_names
 
+
 def display_results(frame, face_locations, face_names):
     # Display the results
     for (top, right, bottom, left), (name, color) in zip(face_locations, face_names):
@@ -58,6 +61,7 @@ def display_results(frame, face_locations, face_names):
 
     # Display the resulting image
     cv2.imshow('Video', frame)
+
 
 def main():
     known_faces, known_face_names = load_known_faces()
@@ -80,6 +84,7 @@ def main():
     # Release handle to the webcam
     video_capture.release()
     cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     main()
