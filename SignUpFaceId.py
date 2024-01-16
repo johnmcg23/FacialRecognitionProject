@@ -3,8 +3,12 @@ import threading
 import cv2
 import os
 import time
+import requests
+import base64
+import requests
 
 app = Flask(__name__)
+
 
 def main():
     # Load the cascade
@@ -52,9 +56,10 @@ def main():
                     filename = 'user_face_' + str(i)
 
                 # Save the image
-                cv2.imwrite(filename + extension, img)  # here send it to the S3 bucket
-                img_saved = True
-                countdown = countdown_start
+                cv2.imwrite(filename + extension, img)
+
+                # Call the new function to upload the image to GitHub
+                upload_to_github(filename + extension)
 
         # Draw rectangle around the faces
         for (x, y, w, h) in faces:
@@ -67,3 +72,36 @@ def main():
 
     # Release the VideoCapture object
     cap.release()
+
+
+def upload_to_github(filename):
+    # Convert the image to base64
+    with open(filename, 'rb') as f:
+        img_base64 = base64.b64encode(f.read()).decode()
+
+    # Set your personal access token, repo, and owner
+    token = os.getenv('GITHUB_TOKEN')
+    owner = 'johnmcg23'
+    repo = 'TheLadsAIWeek'
+
+    # Set the headers for the API request
+    headers = {
+        'Authorization': 'token ' + token,
+        'Accept': 'application/vnd.github.v3+json'
+    }
+
+    # Set the data for the API request
+    data = {
+        'message': 'Add image',
+        'content': img_base64
+    }
+
+    # Make the API request
+    response = requests.put(f'https://api.github.com/repos/{owner}/{repo}/contents/{filename}', headers=headers,
+                            json=data)
+
+    # Check the response
+    if response.status_code == 201:
+        print('Image uploaded to GitHub')
+    else:
+        print('Failed to upload image to GitHub')
