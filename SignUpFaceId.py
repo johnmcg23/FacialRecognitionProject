@@ -47,20 +47,20 @@ while True:
                 filename = 'user_face_' + str(i)
 
             # Save the image
-            cv2.imwrite(filename + extension, img)
+            cv2.imwrite(filename + extension, img)  # here send it to the S3 bucket
             img_saved = True
             countdown = countdown_start
 
     # Draw rectangle around the faces
     for (x, y, w, h) in faces:
-        cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
+        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
     # Display
     cv2.imshow('img', img)
 
     # Stop if escape key is pressed
     k = cv2.waitKey(30) & 0xff
-    if k==27:
+    if k == 27:
         break
 
 # Release the VideoCapture object
