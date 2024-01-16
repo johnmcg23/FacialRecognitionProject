@@ -99,6 +99,7 @@ def upload_to_github(filename):
     if os.path.exists(filename):
         os.remove(filename)
         print('File deleted')
+        return
     else:
         print("The file does not exist")
 
