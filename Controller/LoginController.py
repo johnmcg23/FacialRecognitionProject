@@ -6,7 +6,7 @@ from facialRecognition import main
 app = Flask(__name__)
 
 
-@app.route('/login/faceid', methods=['GET', 'POST'])
+@app.route('/login/faceid', methods=['GET'])
 def GetFaceImageFromS3Bucket():
     # Start the face recognition in a new thread
     threading.Thread(target=main).start()

@@ -36,7 +36,7 @@ def process_frame(frame, known_faces, known_face_names):
         if True in matches:
             first_match_index = matches.index(True)
             name = known_face_names[first_match_index]
-            print('no match')
+            print('match')
             color = (0, 255, 0)  # Green
 
         face_names.append((name, color))
