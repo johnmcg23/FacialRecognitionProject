@@ -9,7 +9,6 @@ import requests
 
 app = Flask(__name__)
 
-
 def main():
     # Load the cascade
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -60,18 +59,8 @@ def main():
 
                 # Call the new function to upload the image to GitHub
                 upload_to_github(filename + extension)
-
-        # Draw rectangle around the faces
-        for (x, y, w, h) in faces:
-            cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
-
-        # Stop if escape key is pressed
-        k = cv2.waitKey(30) & 0xff
-        if k == 27 or img_saved:
-            break
-
-    # Release the VideoCapture object
-    cap.release()
+                cap.release()
+                return
 
 
 def upload_to_github(filename):
@@ -82,7 +71,7 @@ def upload_to_github(filename):
     # Set your personal access token, repo, and owner
     token = os.getenv('GITHUB_TOKEN')
     owner = 'johnmcg23'
-    repo = 'TheLadsAIWeek'
+    repo = 'ImagesForAI'
 
     # Set the headers for the API request
     headers = {
@@ -105,3 +94,11 @@ def upload_to_github(filename):
         print('Image uploaded to GitHub')
     else:
         print('Failed to upload image to GitHub')
+
+    # Delete the file
+    if os.path.exists(filename):
+        os.remove(filename)
+        print('File deleted')
+    else:
+        print("The file does not exist")
+
