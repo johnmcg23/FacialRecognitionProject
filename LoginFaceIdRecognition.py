@@ -1,28 +1,18 @@
-from datetime import time
-from tkinter import Image
+import time
+from PIL import Image
 import cv2
 import face_recognition
 import os
 import requests
 import base64
 import io
+import numpy as np
+from queue import Queue
 
-def display_results(frame, face_locations, face_names):
-    # Display the results
-    for (top, right, bottom, left), (name, color) in zip(face_locations, face_names):
-        # Scale back up face locations since the frame we detected in was scaled to 1/4 size
-        top *= 4
-        right *= 4
-        bottom *= 4
-        left *= 4
-
-        # Draw a box around the face
-        cv2.rectangle(frame, (left, top), (right, bottom), color, 2)
-
-        # Draw a label with a name below the face
-        cv2.rectangle(frame, (left, bottom - 35), (right, bottom), color, cv2.FILLED)
-        font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+# Create a global queue
+# result_queue = Queue()
+#
+# bad_result_queue = Queue()
 
 
 def check_in_github(filename):
@@ -47,14 +37,24 @@ def check_in_github(filename):
         # First, we load the image from the repo
         img_base64 = response.json()['content']
         img_data = base64.b64decode(img_base64)
+
         img = Image.open(io.BytesIO(img_data))
+        img_np = np.array(img)
 
         # Then, we load the current image
         current_img = cv2.imread(filename)
+        current_img_rgb = cv2.cvtColor(current_img, cv2.COLOR_BGR2RGB)
+
+        # Check if a face is detected in the current image
+        current_face_encodings = face_recognition.face_encodings(current_img_rgb)
+        if len(current_face_encodings) == 0:
+            print('Authentication face id failed')
+            return False
+
+        current_face_encoding = current_face_encodings[0]
 
         # We get the face encodings for both images
-        repo_face_encoding = face_recognition.face_encodings(img)[0]
-        current_face_encoding = face_recognition.face_encodings(current_img)[0]
+        repo_face_encoding = face_recognition.face_encodings(img_np)[0]
 
         # And finally, we compare the faces
         match = face_recognition.compare_faces([repo_face_encoding], current_face_encoding)
@@ -112,6 +112,7 @@ def main(username):
 
                 # Call the new function to check the image in GitHub
                 success = check_in_github(filename)
+                #result_queue.put(success)  # Put the result into the queue
 
                 # Delete the local file
                 if os.path.exists(filename):
@@ -120,6 +121,11 @@ def main(username):
                 cap.release()
 
                 return success  # Return boolean value
+        else:
+            print('No face detected')
+            #result_queue.put(False)  # Put False into the queue
+            return False
+
 
 
 if __name__ == "__main__":
