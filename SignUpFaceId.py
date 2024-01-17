@@ -1,24 +1,20 @@
-from flask import Flask
-import threading
+from flask import Flask, jsonify, request
 import cv2
 import os
 import time
 import requests
 import base64
-import requests
 
-app = Flask(__name__)
 
-def main():
+def main(username):
     # Load the cascade
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
     # To capture video from webcam
     cap = cv2.VideoCapture(0)
-    img_saved = False
 
     # Countdown parameters
-    countdown_start = 1
+    countdown_start = 3
     countdown = countdown_start
 
     # Record the start time
@@ -34,8 +30,8 @@ def main():
         # Detect the faces
         faces = face_cascade.detectMultiScale(gray, 1.1, 4)
 
-        # If a face is detected and an image hasn't been saved yet
-        if len(faces) > 0 and not img_saved:
+        # If a face is detected
+        if len(faces) > 0:
             # Display the countdown
             cv2.putText(img, str(countdown), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
@@ -46,21 +42,16 @@ def main():
 
             # If the countdown has finished
             if countdown < 0:
-                # Check if the file exists and increment the filename if it does
-                filename = 'user_face'
-                extension = '.png'
-                i = 0
-                while os.path.exists(filename + extension):
-                    i += 1
-                    filename = 'user_face_' + str(i)
-
-                # Save the image
-                cv2.imwrite(filename + extension, img)
+                # Save the image with the username
+                filename = username + '.png'
+                cv2.imwrite(filename, img)
 
                 # Call the new function to upload the image to GitHub
-                upload_to_github(filename + extension)
+                success = upload_to_github(filename)
+
                 cap.release()
-                return
+
+                return success  # Return boolean value
 
 
 def upload_to_github(filename):
@@ -89,17 +80,12 @@ def upload_to_github(filename):
     response = requests.put(f'https://api.github.com/repos/{owner}/{repo}/contents/{filename}', headers=headers,
                             json=data)
 
-    # Check the response
-    if response.status_code == 201:
-        print('Image uploaded to GitHub')
-    else:
-        print('Failed to upload image to GitHub')
-
     # Delete the file
     if os.path.exists(filename):
         os.remove(filename)
-        print('File deleted')
-        return
-    else:
-        print("The file does not exist")
 
+    # Check the response
+    if response.status_code == 201:
+        return True
+    else:
+        return False

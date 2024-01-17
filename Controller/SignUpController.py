@@ -1,6 +1,4 @@
-from urllib import request
-
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import threading
 
 from SignUpFaceId import main
@@ -8,7 +6,7 @@ from SignUpFaceId import main
 app = Flask(__name__)
 
 
-@app.route('/signup/faceid', methods=['POST'])
+@app.route('/signup/faceid', methods=['GET', 'POST'])
 def runFacialRecognitionSignUp():
     # Get the username from the request
     username = request.json['username']
@@ -20,4 +18,4 @@ def runFacialRecognitionSignUp():
 
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=3000, debug=True)
+    app.run(host='localhost', port=3002, debug=True)
