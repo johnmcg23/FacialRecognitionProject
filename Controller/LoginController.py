@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 
 @app.route('/login/faceid', methods=['GET'])
-def runFacialRecognitionSignUp():
+def runFacialRecognitionLogin():
     # Get the username from the request
     username = request.json['username']
 
