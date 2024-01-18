@@ -31,6 +31,7 @@ def runFacialRecognitionLogin(username):
 
 @app.route('/signup/faceid/<username>', methods=['POST'])
 def runFacialRecognitionSignUp(username):
+    print("Getting into sign up backend")
     # Start the face recognition in a new thread
     threading.Thread(target=signup_main, args=(username,)).start()
 
