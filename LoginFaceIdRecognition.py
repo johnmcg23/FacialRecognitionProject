@@ -85,11 +85,13 @@ def main(username):
     start_time = time.time()
 
     while True:
+        time.sleep(1)  # Delay execution for 2 seconds
         # Read the frame
         _, img = cap.read()
 
         # Convert to grayscale
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
 
         # Detect the faces
         faces = face_cascade.detectMultiScale(gray, 1.1, 4)
